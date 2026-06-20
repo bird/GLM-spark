@@ -1,0 +1,64 @@
+# Recipe: GLM-5.2-NVFP4-REAP-469B (3x DGX Spark, PP=3)
+# REAP-pruned 469B MoE, NVFP4 quantized
+# DSA disabled; TRITON_MLA full attention backend
+# Weight loader patched with posix_fadvise to prevent page cache accumulation
+
+recipe_version: "1"
+name: GLM-5.2-NVFP4-REAP-469B
+description: GLM-5.2 REAP-pruned NVFP4 on 3x DGX Spark (PP=3, TRITON_MLA, DSA disabled)
+
+model: 0xSero/GLM-5.2-NVFP4-REAP-469B
+container: vllm-node-dsv4-cl
+cluster_only: true
+
+mods:
+  - mods/glm-5.2-patches
+
+defaults:
+  port: 8000
+  host: 0.0.0.0
+  tensor_parallel: 1
+  pipeline_parallel: 3
+  gpu_memory_utilization: 0.85
+  max_model_len: 262144
+  max_num_batched_tokens: 2048
+  max_num_seqs: 1
+  kv_cache_dtype: fp8
+  block_size: 128
+  served_model_name: GLM-5.2-NVFP4-REAP-469B
+
+env:
+  TORCH_CUDA_ARCH_LIST: 12.1a
+  FLASHINFER_DISABLE_VERSION_CHECK: "1"
+  NCCL_IB_DISABLE: "0"
+  NCCL_DEBUG: INFO
+  VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS: "1200"
+  VLLM_ALLOW_LONG_MAX_MODEL_LEN: "1"
+  PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
+  VLLM_DISABLE_DSA: "1"
+  MALLOC_ARENA_MAX: "1"
+  RAY_object_store_memory: "8589934592"
+  RAY_memory_monitor_refresh_interval_ms: "0"
+
+command: |
+  exec > /tmp/vllm_serve.log 2>&1
+  vllm serve /root/.cache/huggingface/GLM-5.2-NVFP4-REAP-469B \
+    --served-model-name {served_model_name} \
+    --host {host} \
+    --port {port} \
+    --trust-remote-code \
+    --tensor-parallel-size {tensor_parallel} \
+    --pipeline-parallel-size {pipeline_parallel} \
+    --kv-cache-dtype {kv_cache_dtype} \
+    --block-size {block_size} \
+    --max-model-len {max_model_len} \
+    --max-num-seqs {max_num_seqs} \
+    --max-num-batched-tokens {max_num_batched_tokens} \
+    --gpu-memory-utilization {gpu_memory_utilization} \
+    --distributed-executor-backend ray \
+    --disable-uvicorn-access-log \
+    --enforce-eager \
+    --reasoning-parser glm45 \
+    --tool-call-parser glm47 \
+    --enable-auto-tool-choice \
+    --load-format safetensors
