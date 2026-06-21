@@ -819,7 +819,7 @@ get_env_flags() {
         "RAY_num_prestart_python_workers=0" \
         "RAY_object_store_memory=1073741824" \
         "VLLM_DISABLE_DSA=1" \
-        "MALLOC_ARENA_MAX=1" \
+        "MALLOC_ARENA_MAX=2" \
         "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS=1200" \
         "VLLM_ALLOW_LONG_MAX_MODEL_LEN=1" \
 "FLASHINFER_DISABLE_VERSION_CHECK=1" \

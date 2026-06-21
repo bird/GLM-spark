@@ -30,13 +30,12 @@ defaults:
 env:
   TORCH_CUDA_ARCH_LIST: 12.1a
   FLASHINFER_DISABLE_VERSION_CHECK: "1"
-  NCCL_IB_DISABLE: "0"
   NCCL_DEBUG: INFO
   VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS: "1200"
   VLLM_ALLOW_LONG_MAX_MODEL_LEN: "1"
   PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
   VLLM_DISABLE_DSA: "1"
-  MALLOC_ARENA_MAX: "1"
+  MALLOC_ARENA_MAX: "2"
   RAY_object_store_memory: "8589934592"
   RAY_memory_monitor_refresh_interval_ms: "0"
 
@@ -58,6 +57,6 @@ command: |
     --distributed-executor-backend ray \
     --disable-uvicorn-access-log \
     --reasoning-parser glm45 \
-    --tool-call-parser glm47 \
     --enable-auto-tool-choice \
+    --tool-call-parser glm47 \
     --load-format safetensors
