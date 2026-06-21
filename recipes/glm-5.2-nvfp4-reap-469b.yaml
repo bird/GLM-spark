@@ -22,7 +22,7 @@ defaults:
   gpu_memory_utilization: 0.85
   max_model_len: 262144
   max_num_batched_tokens: 2048
-  max_num_seqs: 1
+  max_num_seqs: 4
   kv_cache_dtype: fp8
   block_size: 128
   served_model_name: GLM-5.2-NVFP4-REAP-469B
@@ -57,7 +57,6 @@ command: |
     --gpu-memory-utilization {gpu_memory_utilization} \
     --distributed-executor-backend ray \
     --disable-uvicorn-access-log \
-    --enforce-eager \
     --reasoning-parser glm45 \
     --tool-call-parser glm47 \
     --enable-auto-tool-choice \
